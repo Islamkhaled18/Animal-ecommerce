@@ -1,0 +1,9 @@
+@font-face {
+    font-family: c-rg;
+    src: url(../fonts/careem-regular.otf);
+}
+
+@font-face {
+    font-family: c-bd;
+    src: url(../fonts/careem-bold.otf);
+}

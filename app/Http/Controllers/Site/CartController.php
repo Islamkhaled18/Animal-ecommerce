@@ -1,0 +1,328 @@
+<?php
+
+namespace App\Http\Controllers\Site;
+
+use App\Http\Controllers\Controller;
+use App\Models\Cart;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Services\FatoorahServices;
+
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use GuzzleHttp\Client;
+
+class CartController extends Controller
+{
+    public function addProduct(Request $request)
+    {
+        $product_id = $request->input('product_id');
+        $product_quantity = $request->input('product_quantity');
+
+        if (Auth::check()) {
+
+            $product_check = Product::where('id', $product_id);
+
+            if ($product_check) {
+                if (Cart::where('product_id', $product_id)->where('user_id', Auth::id())->exists()) {
+                    return response()->json(['success' => 'Added before ..!']);
+                } else {
+                    $cartItem = new Cart();
+                    $cartItem->product_id = $product_id;
+                    $cartItem->user_id = Auth::id();
+                    $cartItem->product_quantity = $product_quantity;
+                    $cartItem->save();
+                    return response()->json(['success' => 'Added successfully']);
+                }
+            }
+        } else {
+            return response()->json(['success' => 'You must login first']);
+        }
+    }
+
+    public function viewCart()
+    {
+        $cartItems = Cart::where('user_id', Auth::id())->get();
+        return view('site.cart.cart', compact('cartItems'));
+    }
+
+    public function deleteProduct(Request $request)
+    {
+        if (Auth::check()) {
+
+            $product_id = $request->input('product_id');
+            if (Cart::where('product_id', $product_id)->where('user_id', Auth::id())->exists()) {
+                $cartItem = Cart::where('product_id', $product_id)->where('user_id', Auth::id())->first();
+                $cartItem->delete();
+                return response()->json(['success' => 'Deleted successfully']);
+            }
+        } else {
+            return response()->json(['success' => 'You must login first']);
+        }
+    }
+
+    public function updateCart(Request $request)
+    {
+        $product_id = $request->input('product_id');
+        $product_quantity = $request->input('product_quantity');
+
+        if (Auth::check()) {
+            if (Cart::where('product_id', $product_id)->where('user_id', Auth::id())->exists()) {
+                $cart = Cart::where('product_id', $product_id)->where('user_id', Auth::id())->first();
+                $cart->product_quantity = $product_quantity;
+                $cart->update();
+                return response()->json(['success' => 'updated']);
+            }
+        }
+    }
+
+    public function cartCount(){
+        $cartCount = Cart::where('user_id',Auth::id())->count();
+
+        return response()->json(['count'=>$cartCount]);
+    }
+
+
+    private $fatoorahServices;
+
+    public function __construct(FatoorahServices $fatoorahServices)
+    {
+        $this->fatoorahServices = $fatoorahServices;
+
+        
+    }
+
+
+    public function payOrder()
+    {
+        $data = [
+
+            "CustomerName" => 'islam',
+            "NotificationOption" => 'LNK', // this how the response return whatever link or email or phone
+            'InvoiceValue' => '100',
+            'CustomerEmail' => 'i.k@g.c',
+            'CallBackUrl' => 'http://google.com',
+            "ErrorUrl" => 'http://youtube.com',
+            "Language" => 'en',
+            "DisplayCurrencyIso" => 'SAR'
+        ];
+
+        $this-> fatoorahServices->sendPayment($data);
+        
+    }
+
+    
+
+    
+
+    public function paymentCallBack(Request $request)
+    {
+        $data = [];
+        $data['key'] = $request->paymentId;
+        $data['keyType'] = 'paymentId';
+        $this->fatoorahServices->getPaymentStatus($data);
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // private $base_url;
+    // private $request_client;
+    // private $token;
+
+
+    // public function fatoorah()
+    // {
+    //     $token  = 'map7mmxHnVxraKXGDC3A9R-hJptVHKdEUflEC3wtz2Mrv80t5EEVMAybPbZwdIjTQy8dHwktUTxYFt8DsNr3sWtcjC36BqdRTbVWs3oQ9s_a9JhY1E5Xrtk5TdYNOBjDxa25HilsMRYBEiAZcGnt0jzMo-orvZSJ4EVNtK-NOMPUK9GQ5yrwclqCwAou0uERPnfrv8lm85AVROLOUmCklvgZ-2uAV7rGYmeqcToDNC-KV45_FPrI6P4X1B7R3dkj8vg9EJCKKKx7UGV2CVNNRH9D3RKAkskp2wLpTlBh0k9fWt1Xl0wKgvB3K9WjP8tBwaX3fkAsFvoVh_8EAZSovquUlDiaX-OQRi39V662jsSSIsNd9IL3MoUUvMTo4hyr-H-g2EEOBQjYuVy6fM5mD3VzBISndvJOtFuNh3xqxt9PJOshP00cwHTE3XjQjWsW2KoGhEtFdmgml7GLp3Ve1ndJ5LIGRWM7Cyj6dsY5Idks4h5JC-J5YphwD-6THn639vjQF2rNPp27fyIe9DwD5OAcr4EoSy_Nuof_Eq4xjYUhiTdwNnmgjUb4uu77PzjK54Mib7H0PJBK0hIJG9AlvIzsDQlU_VTMJrU2togZdGLWoDc06r8tuKZo75iX4vYGUrMT4OR_XVmR3hgKtdLLpBEFrGagGSgdt4enUv-sk_KgNjpC';
+    //     $basURL = 'https://apitest.myfatoorah.com';
+
+    //     $curl = curl_init();
+
+    //     curl_setopt_array($curl, array(
+    //         CURLOPT_URL => "$basURL/v2/ExecutePayment",
+    //         CURLOPT_CUSTOMREQUEST => "POST",
+    //         CURLOPT_POSTFIELDS => "{\"PaymentMethodId\":\"2\",\"CustomerName\": \"Ahmed\",\"DisplayCurrencyIso\": \"KWD\", \"MobileCountryCode\":\"+965\",\"CustomerMobile\": \"92249038\",\"CustomerEmail\": \"aramadan@myfatoorah.com\",\"InvoiceValue\": 100,\"CallBackUrl\": \"https://google.com\",\"ErrorUrl\": \"https://google.com\",\"Language\": \"en\",\"CustomerReference\" :\"ref 1\",\"CustomerCivilId\":12345678,\"UserDefinedField\": \"Custom field\",\"ExpireDate\": \"\",\"CustomerAddress\" :{\"Block\":\"\",\"Street\":\"\",\"HouseBuildingNo\":\"\",\"Address\":\"\",\"AddressInstructions\":\"\"},\"InvoiceItems\": [{\"ItemName\": \"Product 01\",\"Quantity\": 1,\"UnitPrice\": 100}]}",
+    //         CURLOPT_HTTPHEADER => array("Authorization: Bearer $token", "Content-Type: application/json"),
+    //     ));
+    //     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+    //     $response = curl_exec($curl);
+    //     $err = curl_error($curl);
+    //     curl_close($curl);
+    //     if ($err) {
+    //         return  "cURL Error #:" . $err;
+    //     } else {
+    //         return response()->json($response);
+    //     }
+
+    //     $json  = json_decode((string)$response, true);
+    //     //echo "json  json: $json '<br />'";
+
+    //     $payment_url = $json["Data"]["PaymentURL"];
+
+    //     # after getting the payment url call it as a post API and pass card info to it
+    //     # if you saved the card info before you can pass the token for the api
+
+    //     $curl = curl_init();
+    //     curl_setopt_array($curl, array(
+    //         CURLOPT_URL => "$payment_url",
+    //         CURLOPT_CUSTOMREQUEST => "POST",
+    //         CURLOPT_POSTFIELDS => "{\"paymentType\": \"card\",\"card\": {\"Number\":\"5123450000000008\",\"expiryMonth\":\"05\",\"expiryYear\":\"21\",\"securityCode\":\"100\"},\"saveToken\": false}",
+    //         CURLOPT_HTTPHEADER => array("Authorization: Bearer $token", "Content-Type: application/json"),
+    //     ));
+
+    //     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    //     $response2 = curl_exec($curl);
+    //     $err = curl_error($curl);
+
+    //     curl_close($curl);
+
+    //     if ($err) {
+    //         return  "cURL Error #:" . $err;
+    //     } else {
+    //         // return 'dfdfdf';
+    //         return response()->json($response2);
+    //     }
+    // }
+
+    // public function __construct(Client $request_client)
+    // {
+    //     $this->request_client = $request_client;
+    //     $this->base_url = env('MYFATOORAHBASEURL');
+    //     $this->token = env('MYFATOORAHTOKEN');
+    // }
+
+    // /**
+    //  * @param Request $request
+    //  */
+    // public function processPayment(Request $request)
+    // {
+
+
+    //     return'fdafdf';
+
+    //     $error = '';
+
+    //     //best practice as we do sperate validation on request form file
+    //     $validator = Validator::make($request->all(), [
+    //         'ccNum' => 'required',
+    //         'ccExp' => 'required',
+    //         'ccCvv' => 'required|numeric',
+    //         'new_total' => 'numeric|min:100',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $error = 'Please check if you have filled in the form correctly. Minimum order amount is PHP 100.';
+    //     }
+
+    //     $ccNum = str_replace(' ', '', $request->ccNum);
+    //     $ccExp = $request->ccExp;
+    //     $ccCvv = $request->ccCvv;
+    //     $new_total = $request->new_total;
+    //     $customerName = auth()->user()->name;
+    //     $customerEmail = 'demo@gmail.com';
+    //     $phone = substr(auth()->user()->mobile, 4);
+    //     $ccExp = (explode('/', $ccExp));
+    //     $ccMon = $ccExp[0];
+    //     $ccYear = $ccExp[1];
+    //     $customerMobile = strlen($phone) <= 11 ? $phone : '123456';
+    //     $data['Language'] = 'en';
+    //     $PaymentMethodId = $request->PaymentMethodId;
+    //     $token = $this->token;
+    //     $basURL = $this->base_url;
+    //     $curl = curl_init();
+
+
+    //     // you can use laravel http or Guzzl and you my create an object to encode that oject direct on requrest
+    //     curl_setopt_array($curl, array(
+    //         CURLOPT_URL => "$basURL/v2/ExecutePayment",
+    //         CURLOPT_CUSTOMREQUEST => "POST",
+    //         CURLOPT_POSTFIELDS => "{\"PaymentMethodId\":\"$PaymentMethodId\",\"CustomerName\": \"$customerName\",\"DisplayCurrencyIso\": \"SAR\", \"MobileCountryCode\":\"+965\",\"CustomerMobile\": \"$customerMobile\",\"CustomerEmail\": \"$customerEmail\",\"InvoiceValue\": $amount,\"CallBackUrl\": \"https://dieera.com\",\"ErrorUrl\": \"https://dieera.com\",\"Language\": \"en\",\"CustomerReference\" :\"ref 1\",\"CustomerCivilId\":12345678,\"UserDefinedField\": \"Custom field\",\"ExpireDate\": \"\",\"CustomerAddress\" :{\"Block\":\"\",\"Street\":\"\",\"HouseBuildingNo\":\"\",\"Address\":\"\",\"AddressInstructions\":\"\"},\"InvoiceItems\": []}",
+    //         CURLOPT_HTTPHEADER => array("Authorization: Bearer $token", "Content-Type: application/json"),
+    //     ));
+    //     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+    //     $response = curl_exec($curl);
+    //     $err = curl_error($curl);
+    //     curl_close($curl);
+    //     if ($err) {
+    //         return [
+    //             'payment_success' => false,
+    //             'status' => 'faild',
+    //             'error' => $err
+    //         ];
+    //     }
+
+    //     $json = json_decode((string)$response, true);
+    //     //echo "json  json: $json '<br />'";
+
+    //     $payment_url = $json["Data"]["PaymentURL"];
+
+    //     $card = new \stdClass();
+    //     $card->Number = $ccNum;
+    //     $card->expiryMonth = trim($ccMon);
+    //     $card->expiryYear = trim($ccYear);
+    //     $card->securityCode = trim($ccCvv);
+    //     $card_data = json_encode($card);
+
+    //     $curl = curl_init();
+    //     curl_setopt_array($curl, array(
+    //         CURLOPT_URL => "$payment_url",
+    //         CURLOPT_CUSTOMREQUEST => "POST",
+    //         CURLOPT_POSTFIELDS => "{\"paymentType\": \"card\",\"card\":$card_data,\"saveToken\": false}",
+    //         CURLOPT_HTTPHEADER => array("Authorization: Bearer $token", "Content-Type: application/json"),
+    //     ));
+    //     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    //     $response = curl_exec($curl);
+    //     $err = curl_error($curl);
+
+    //     curl_close($curl);
+
+    //     if ($err) {
+    //         return [
+    //             'paymemt_success' => false,
+    //             'status' => 'faild',
+    //             'error' => $err
+    //         ];
+    //     }
+
+    //     $json = json_decode((string)$response, true);
+    //     $PaymentId = $json["Data"]["PaymentId"];
+    //     // try {
+    //         DB::beginTransaction();
+    //         // if success payment save order and send realtime notification to admin
+    //         $order = $this->saveOrder($new_total, $PaymentMethodId);  // your task is  . add products with options to order to preview on admin
+    //         $this->saveTransaction($order, $PaymentId);
+    //         DB::commit();
+
+    //         //fire event on order complete success for realtime notification
+    //         event(new Cart($order));
+    //     // } catch (\Exception $ex) {
+    //     //     DB::rollBack();
+    //     //     return $ex;
+    //     // }
+    //     // replace return statment with message that tell the user that the payment successes
+    //     return [
+    //         'payment_success' => true,
+    //         'token' => $PaymentId,
+    //         'data' => $json,
+    //         'status' => 'succeeded',
+    //     ];
+    // }
+
+
+}
