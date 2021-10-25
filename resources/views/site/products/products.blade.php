@@ -152,7 +152,7 @@
                             {{ trans('dashboard.availability') }}
                             <i class="la la-check-circle"></i>
                         </b>
-                        <button type="button" class="btn addToCartBtn">اضف للسلة</button>
+                        <button type="button" class="btn addToCartBtn">{{ trans('front.add_to_cart') }}</button>
                     </div>
                 </div>
 
@@ -252,7 +252,7 @@
                 <div class="single-related col-xs-12">
                     <div class="products-s col-xs-12">
                         <div class="g-head col-xs-12">
-                            <h3>منتجات ذات صلة</h3>
+                            <h3>{{ trans('front.related_products') }}</h3>
                         </div>
                         <div class="g-body col-xs-12">
                             <div class="products-slider owl-carousel">

@@ -28,6 +28,15 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        $this->validate($request, [
+            'product_name_ar' => 'required',
+            'product_name_en' => 'required',
+            'description_ar' => 'required',
+            'description_en' => 'required',
+            'short_description_ar' => 'required',
+            'short_description_en' => 'required',
+         
+            ]);
 
     
         if (!$request->has('is_active'))
@@ -36,7 +45,7 @@ class ProductController extends Controller
             $request->request->add(['is_active' => 1]);
 
             $product = new Product();
-            $product->product_name      = ['ar' => $request->product_name_ar      ,'en' => $request->product_name__en];
+            $product->product_name      = ['ar' => $request->product_name_ar      ,'en' => $request->product_name_en];
             $product->slug              = ['ar' => $request->slug_ar              , 'en' => $request->slug_en];
             $product->description       = ['ar' => $request->description_ar       , 'en' => $request->description_en];
             $product->short_description = ['ar' => $request->short_description_ar , 'en' => $request->short_description_en];    
@@ -67,6 +76,17 @@ class ProductController extends Controller
     public function update($id, Request $request)
     {        
 
+         $this->validate($request, [
+            'product_name_ar' => 'required',
+            'product_name_en' => 'required',
+            'description_ar' => 'required',
+            'description_en' => 'required',
+            'short_description_ar' => 'required',
+            'short_description_en' => 'required',
+         
+            ]);
+
+            
         $product = Product::find($id);
         
         if(!$product)

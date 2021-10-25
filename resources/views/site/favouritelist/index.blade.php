@@ -3,7 +3,7 @@
 @section('content')
 
     <main class="main-content col-xs-12">
-        <div class="bread-crumb col-xs-12" style="background-image: url({{asset('uploads/about_us/hero.png')}})">
+        <div class="bread-crumb col-xs-12" style="background-image: url({{ asset('uploads/about_us/hero.png') }})">
             <div class="container">
                 <h3>{{ trans('front.favourite_list') }}</h3>
                 <ul>
@@ -27,9 +27,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            
+
                             @foreach ($all_product as $product)
-                            
+
                                 <tr>
                                     <td>
                                         <a href="#" class="removeFromFavouriteList addToFavouriteList t-remove"
@@ -40,19 +40,19 @@
                                     <td>
                                         <div class="t-product">
                                             <div class="t-img">
-                                                <img src="{{$product->images[0]->photo}}" alt="">
+                                                <img src="{{ $product->images[0]->photo }}" alt="">
                                                 <a href="#"></a>
                                             </div>
                                             <div class="t-data">
                                                 <a href="#">{{ $product->product_name }}</a>
-                                                <span>{{$product->description }}</span>
+                                                <span>{{ $product->description }}</span>
                                                 <p>{{ $product->special_price }}</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td>{{ trans('dashboard.availability') }}</td>
                                     <td>
-                                        <a href="#" class="btn">اضف للسلة</a>
+                                        <a href="#" class="btn addToCartBtn">{{ trans('front.add_to_cart') }}</a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -92,38 +92,37 @@
 
     $(document).ready(function() {
 
-loadcart();
+        loadcart();
 
-function loadcart() {
-    $.ajax({
-        method: 'GET',
-        url: '/load-cart-data',
-        success: function(response) {
+        function loadcart() {
+            $.ajax({
+                method: 'GET',
+                url: '/load-cart-data',
+                success: function(response) {
 
-          
 
-            $('.cart-count').html('');
-            $('.cart-count').html(response.count);
 
+                    $('.cart-count').html('');
+                    $('.cart-count').html(response.count);
+
+                }
+
+            });
         }
 
     });
-}
 
-});
-    
 
-    $(document).ready(function ()
-    {
-        
+    $(document).ready(function() {
+
         countFav();
-        
-        function countFav(){
+
+        function countFav() {
             $.ajax({
                 method: 'GET',
                 url: '/count-fav-prod',
-                success: function (response){
-                    
+                success: function(response) {
+
                     $('.countFavProd').html('');
                     $('.countFavProd').html(response.count);
 
@@ -182,5 +181,28 @@ function loadcart() {
         });
     });
 
-    
+    $(document).ready(function() {
+
+        $('.addToCartBtn').click(function(e) {
+            e.preventDefault();
+            var token = $('input[name=_token]');
+            var product_id = $(this).closest('.product_data').find('.product_id').val();
+            var product_quantity = $(this).closest('.product_data').find('.qty-btn').val();
+
+            $.ajax({
+                method: 'GET',
+                url: '/add-to-cart',
+                data: {
+                    'product_id': product_id,
+                    'product_quantity': product_quantity,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': token.val()
+                },
+                success: function(response) {
+
+                }
+            });
+        });
+    });
 </script>

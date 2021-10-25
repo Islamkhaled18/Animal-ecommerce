@@ -26,6 +26,7 @@ Route::group(
         });
 
         Route::group(['middleware' => 'auth'], function () {
+            
             Route::get('/home', 'HomeController@index')->name('home');
             Route::get('/aboutus', function () {
                 return view('site.aboutus.aboutus');
@@ -53,7 +54,7 @@ Route::group(
         //   Route::get('/categories/{id}','Site\CategoryController@productsById')->name('categories');
           Route::get('/AllCategories', 'Site\CategoryController@index')->name('AllCategories');
           
-            //////////////////////////blogs/////////////////////////////////////////
+            //////////////////////////blogs/////////////////////////////////////////////
             Route::get('/privacyPolicy', function () {
                 return view('site.privacypolicy.privacypolicy');
             });

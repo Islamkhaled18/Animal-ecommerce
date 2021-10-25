@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <title>
@@ -11,17 +11,17 @@
     <meta charset="utf-8">
     <meta name="author" content="Amir Nageh">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}"> 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Css Files -->
-    <link href="{{asset('assets/front/css/style.css')}}" rel="stylesheet">
-    <link href="{{asset('assets/front/css/bootstrap-rtl.min.css')}}" rel="stylesheet">
+    <link href="{{ asset('assets/front/css/style.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/front/css/bootstrap-rtl.min.css') }}" rel="stylesheet">
     <!--<link href="css/style-en.css" rel="stylesheet">-->
-    <link href="{{asset('assets/front/css/style-res.css')}}" rel="stylesheet">
+    <link href="{{ asset('assets/front/css/style-res.css') }}" rel="stylesheet">
     <!-- lavicons -->
-    <link rel="shortcut icon" href="{{asset('assets/front/images/faveicon.png')}}">
+    <link rel="shortcut icon" href="{{ asset('assets/front/images/faveicon.png') }}">
 
 
 </head>
@@ -33,7 +33,7 @@
 
         </div>
     </div>
-    
+
     <div class="wrapper col-xs-12">
         <header class="main-head col-xs-12">
             <div class="top-head col-xs-12">
@@ -41,35 +41,40 @@
                     <div class="tr-extra">
                         <ul>
                             @auth
-                            <li class="menu-item-has-children">
-                                <a href="{{route('profile.user',auth()->user()->id)}}">
-                                    <i class="la la-user"></i>
-                                    {{ trans('front.my_account') }}
-                                </a>
-                                <ul class="sub-menu">
-                                    <li>
-                                        <a href="{{ route('logout') }}">{{ trans('front.logout') }}</a>
-                                    </li>
-                                </ul>
-                                
-                            </li>
-                           
+                                <li class="menu-item-has-children">
+                                    <a href="{{ route('profile.user', auth()->user()->id) }}">
+                                        <i class="la la-user"></i>
+                                        {{ trans('front.my_account') }}
+                                    </a>
+                                    <ul class="sub-menu">
+                                        <li>
+                                            <a href="{{ route('logout') }}">{{ trans('front.logout') }}</a>
+                                        </li>
+                                    </ul>
+
+                                </li>
+
                             @endauth
-                            <li class="menu-item-has-children">
-                                <a href="javascript;">
-                                    <i class="la la-globe"></i>
-                                    عربي
-                                </a>
-                                <ul class="sub-menu">
-                                    <li>
-                                        <a href="#">عربي</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">English</a>
-                                    </li>
-                                    
-                                </ul>
-                            </li>
+                            <div class="btn-group mb-1">
+                                <button type="button" class="btn btn-light btn-sm dropdown-toggle"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    @if (App::getLocale() == 'ar')
+                                        {{ LaravelLocalization::getCurrentLocaleName() }}
+                                        <img src="{{ URL::asset('assets/images/flags/EG.png') }}" alt="">
+                                    @else
+                                        {{ LaravelLocalization::getCurrentLocaleName() }}
+                                        <img src="{{ URL::asset('assets/images/flags/US.png') }}" alt="">
+                                    @endif
+                                </button>
+                                <div class="dropdown-menu">
+                                    @foreach (LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+                                        <a class="dropdown-item" rel="alternate" hreflang="{{ $localeCode }}"
+                                            href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}">
+                                            {{ $properties['native'] }}
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
                         </ul>
                     </div>
                     <div class="tl-extra">
@@ -97,37 +102,40 @@
                 <div class="container">
                     <div class="logo">
                         <a href="#">
-                            <img src="{{asset('assets/front/images/logo.png')}}" alt="">
-                            
+                            <img src="{{ asset('assets/front/images/logo.png') }}" alt="">
+
                         </a>
                     </div>
                     <div class="main-menu">
                         <ul>
                             <li>
-                                <a href="{{url('/site')}}">{{trans('front.home')}}</a>
+                                <a href="{{ url('/site') }}">{{ trans('front.home') }}</a>
                             </li>
                             <li>
-                                <a href="{{url('/aboutus')}}">{{ trans('front.about_us') }}</a>
+                                <a href="{{ url('/aboutus') }}">{{ trans('front.about_us') }}</a>
                             </li>
                             <li class="menu-item-has-children">
-                                <a href="{{route('AllCategories')}}">{{ trans('front.store') }}</a>
+                                <a href="{{ route('AllCategories') }}">{{ trans('front.store') }}</a>
                                 <ul class="sub-menu">
-                                
+
                                     @isset($categories)
-                                        @foreach($categories as $category)
+                                        @foreach ($categories as $category)
                                             <li class="menu-item-has-children">
-                                                <a href="{{route('AllCategories',['category_id' => $category->id])}}">{{ $category->category_name }}</a>
+                                                <a
+                                                    href="{{ route('AllCategories', ['category_id' => $category->id]) }}">{{ $category->category_name }}</a>
                                                 <ul class="sub-menu">
                                                     <li>
-                                                        @isset($category ->childrens)
-                                                            @foreach ( $category ->childrens as $children )
-                                                                <a href="{{route('AllCategories',['category_id' => $category->id])}}">{{$children->category_name}}</a>
+                                                        @isset($category->childrens)
+                                                            @foreach ($category->childrens as $children)
+                                                                <a
+                                                                    href="{{ route('AllCategories', ['category_id' => $category->id]) }}">{{ $children->category_name }}</a>
                                                                 <ul class="sub-menu">
-                                                                    @isset($children ->childrens )
-                                                                        @foreach($children ->childrens  as $_children)
-                                                                        <li>
-                                                                            <a href="{{route('AllCategories',['category_id' => $category->id])}}">{{$_children ->category_name}}</a>
-                                                                        </li>
+                                                                    @isset($children->childrens)
+                                                                        @foreach ($children->childrens as $_children)
+                                                                            <li>
+                                                                                <a
+                                                                                    href="{{ route('AllCategories', ['category_id' => $category->id]) }}">{{ $_children->category_name }}</a>
+                                                                            </li>
                                                                         @endforeach
                                                                     @endisset
                                                                 </ul>
@@ -135,114 +143,119 @@
                                                         @endisset
                                                     </li>
                                                 </ul>
-                                                
+
                                             </li>
                                         @endforeach
                                     @endisset
-                                    
+
                                 </ul>
                             </li>
                             <li>
-                                <a href="{{route('site.services')}}">{{ trans('front.services') }}</a>
-                                
+                                <a href="{{ route('site.services') }}">{{ trans('front.services') }}</a>
+
                             </li>
                             <li>
-                                <a href="{{url('/blogs')}}">{{ trans('dashboard.blogs') }}</a>
+                                <a href="{{ url('/blogs') }}">{{ trans('dashboard.blogs') }}</a>
                             </li>
                             <li>
-                                <a href="{{url('contactus')}}">{{ trans('front.contact_us') }}</a>
+                                <a href="{{ url('contactus') }}">{{ trans('front.contact_us') }}</a>
                             </li>
                         </ul>
                     </div>
                     <div class="bl-extra">
-                        <a href="{{route('search')}}" data-toggle="modal" data-target="#search_pop">
+                        <a href="{{ route('search') }}" data-toggle="modal" data-target="#search_pop">
                             <i class="la la-search"></i>
                         </a>
                         <ul class="notification-menu" style="display: none;">
                             <li class="menu-item-has-children">
                                 <a href="javascript:void(0)">
-                                <i class="la la-bell"></i>
-                                <span class="badgo">3</span>
-                            </a>
-                            <ul class="sub-menu">
-                                <li>
-                                    <div class="menu-inner">
-                                        <div class="menu-top">
-                                            <h4>الاشعارات</h4>
-                                            <a href="#">
-                                                <i class="la la-bell"></i>
-                                            </a>
+                                    <i class="la la-bell"></i>
+                                    <span class="badgo">3</span>
+                                </a>
+                                <ul class="sub-menu">
+                                    <li>
+                                        <div class="menu-inner">
+                                            <div class="menu-top">
+                                                <h4>الاشعارات</h4>
+                                                <a href="#">
+                                                    <i class="la la-bell"></i>
+                                                </a>
+                                            </div>
+                                            <div class="menu-content">
+                                                <ul>
+                                                    <li>
+                                                        <a href="#">
+                                                            <img src="{{ asset('assets/front/images/ex1.png') }}"
+                                                                alt="">
+
+                                                            <div class="a_user">
+                                                                <h3>منى فاروق</h3>
+                                                                <span>علقت على اعلانك</span>
+                                                                <p>المنتج كويس بس ياريت تفاصيل اكتر</p>
+                                                                <b>منذ 5 دقائق</b>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <img src="{{ asset('assets/front/images/ex2.png') }}"
+                                                                alt="">
+                                                            <div class="a_user">
+                                                                <h3>منى فاروق</h3>
+                                                                <span>علقت على اعلانك</span>
+                                                                <p>المنتج كويس بس ياريت تفاصيل اكتر</p>
+                                                                <b>منذ 5 دقائق</b>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <img src="{{ asset('assets/front/images/ex1.png') }}"
+                                                                alt="">
+                                                            <div class="a_user">
+                                                                <h3>منى فاروق</h3>
+                                                                <span>علقت على اعلانك</span>
+                                                                <p>المنتج كويس بس ياريت تفاصيل اكتر</p>
+                                                                <b>منذ 5 دقائق</b>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <img src="{{ asset('assets/front/images/ex2.png') }}"
+                                                                alt="">
+                                                            <div class="a_user">
+                                                                <h3>منى فاروق</h3>
+                                                                <span>علقت على اعلانك</span>
+                                                                <p>المنتج كويس بس ياريت تفاصيل اكتر</p>
+                                                                <b>منذ 5 دقائق</b>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <img src="{{ asset('assets/front/images/ex1.png') }}"
+                                                                alt="">
+                                                            <div class="a_user">
+                                                                <h3>منى فاروق</h3>
+                                                                <span>علقت على اعلانك</span>
+                                                                <p>المنتج كويس بس ياريت تفاصيل اكتر</p>
+                                                                <b>منذ 5 دقائق</b>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </div>
-                                        <div class="menu-content">
-                                            <ul>
-                                                <li>
-                                                    <a href="#">
-                                                        <img src="{{asset('assets/front/images/ex1.png')}}" alt="">
-                                                        
-                                                        <div class="a_user">
-                                                            <h3>منى فاروق</h3>
-                                                            <span>علقت على اعلانك</span>
-                                                            <p>المنتج كويس بس ياريت تفاصيل اكتر</p>
-                                                            <b>منذ 5 دقائق</b>
-                                                        </div>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">
-                                                        <img src="{{asset('assets/front/images/ex2.png')}}" alt="">
-                                                        <div class="a_user">
-                                                            <h3>منى فاروق</h3>
-                                                            <span>علقت على اعلانك</span>
-                                                            <p>المنتج كويس بس ياريت تفاصيل اكتر</p>
-                                                            <b>منذ 5 دقائق</b>
-                                                        </div>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">
-                                                        <img src="{{asset('assets/front/images/ex1.png')}}" alt="">
-                                                        <div class="a_user">
-                                                            <h3>منى فاروق</h3>
-                                                            <span>علقت على اعلانك</span>
-                                                            <p>المنتج كويس بس ياريت تفاصيل اكتر</p>
-                                                            <b>منذ 5 دقائق</b>
-                                                        </div>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">
-                                                        <img src="{{asset('assets/front/images/ex2.png')}}" alt="">
-                                                        <div class="a_user">
-                                                            <h3>منى فاروق</h3>
-                                                            <span>علقت على اعلانك</span>
-                                                            <p>المنتج كويس بس ياريت تفاصيل اكتر</p>
-                                                            <b>منذ 5 دقائق</b>
-                                                        </div>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">
-                                                        <img src="{{asset('assets/front/images/ex1.png')}}" alt="">
-                                                        <div class="a_user">
-                                                            <h3>منى فاروق</h3>
-                                                            <span>علقت على اعلانك</span>
-                                                            <p>المنتج كويس بس ياريت تفاصيل اكتر</p>
-                                                            <b>منذ 5 دقائق</b>
-                                                        </div>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
+                                    </li>
+                                </ul>
                             </li>
                         </ul>
-                        <a href="{{route('favouritelist.product.index')}}">
+                        <a href="{{ route('favouritelist.product.index') }}">
                             <b class="badgo countFavProd">0</b>
                             <i class="la la-heart"></i>
                         </a>
-                        <a href="{{route('cart')}}">
+                        <a href="{{ route('cart') }}">
                             <b class="badgo cart-count">0</b>
                             <i class="la la-shopping-cart"></i>
                         </a>
@@ -257,12 +270,12 @@
                 <div class="container">
                     <div class="logo">
                         <a href="#">
-                            <img src="{{asset('assets/front/images/logo.png')}}" alt="">
+                            <img src="{{ asset('assets/front/images/logo.png') }}" alt="">
                         </a>
                     </div>
 
 
-                    <form action="{{route('search')}}" method="post">
+                    <form action="{{ route('search') }}" method="post">
                         @csrf
                         <input type="search" class="form-control" placeholder="اكتب بحثك هنا">
                         <button type="submit">
@@ -271,7 +284,7 @@
                     </form>
 
                 </div>
-                
+
             </div>
             <div class="m-mid col-xs-12">
                 <a href="javascript:void(0)" class="op-menu">
@@ -294,8 +307,8 @@
             </div>
             <div class="main-sticky">
                 <button type="button" class="off-menu">
-        <i class="la la-close"></i>
-    </button>
+                    <i class="la la-close"></i>
+                </button>
                 <ul class="nav-tabs">
                     <li class="active">
                         <a href="#" data-toggle="tab" data-target="#t111">
@@ -320,37 +333,37 @@
                     <div class="tab-pane fade active in" id="t111">
                         <ul>
                             <li>
-                                <a href="{{url('/site')}}">{{trans('front.home')}}</a>
+                                <a href="{{ url('/site') }}">{{ trans('front.home') }}</a>
                             </li>
                             <li>
-                                <a href="{{url('/aboutus')}}">{{ trans('front.about_us') }}</a>
+                                <a href="{{ url('/aboutus') }}">{{ trans('front.about_us') }}</a>
                             </li>
                             <li class="menu-item-has-children">
                                 <a href="javascript:void(0)">{{ trans('front.store') }}</a>
                                 <ul class="sub-menu">
-                                    @foreach ($categories as $category )
-                                    <li class="menu-item-has-children">
-                                        <a href="javascript:void(0)">{{$category->category_name}}</a>
-                                        <ul class="sub-menu">
-                                            <li>
-                                                @foreach ( $category ->childrens as $children )
-                                                <a href="#">{{$children->category_name}}</a>
-                                                <ul class="sub-menu">
-                                                    @foreach($children ->childrens  as $_children)
-                                                    <li>
-                                                        <a href="#">{{$_children ->category_name}}</a>
-                                                    </li>
+                                    @foreach ($categories as $category)
+                                        <li class="menu-item-has-children">
+                                            <a href="javascript:void(0)">{{ $category->category_name }}</a>
+                                            <ul class="sub-menu">
+                                                <li>
+                                                    @foreach ($category->childrens as $children)
+                                                        <a href="#">{{ $children->category_name }}</a>
+                                                        <ul class="sub-menu">
+                                                            @foreach ($children->childrens as $_children)
+                                                                <li>
+                                                                    <a href="#">{{ $_children->category_name }}</a>
+                                                                </li>
+                                                            @endforeach
+
+                                                        </ul>
                                                     @endforeach
-                                                   
-                                                </ul>
-                                                @endforeach
-                                                
-                                            </li>
-                                        </ul>
-                                    </li>
-                                        
+
+                                                </li>
+                                            </ul>
+                                        </li>
+
                                     @endforeach
-                                    
+
                                 </ul>
                             </li>
                             <li class="menu-item-has-children">
@@ -368,7 +381,7 @@
                                 <a href="#">المدونة</a>
                             </li>
                             <li>
-                                <a href="{{url('contactus')}}">{{ trans('front.contact_us') }}</a>
+                                <a href="{{ url('contactus') }}">{{ trans('front.contact_us') }}</a>
                             </li>
                         </ul>
                     </div>
@@ -402,11 +415,11 @@
                     </div>
                 </div>
             </div>
-        </header>   
+        </header>
 
         @yield('content')
 
-        
+
         <footer class="main-footer col-xs-12">
             <div class="footer-top col-xs-12">
                 <div class="newsletter col-md-4 col-xs-12" style="background-image: url(images/footer-bg.png)">
@@ -421,7 +434,8 @@
                     <form action="{{ route('followers.store') }}" method="post">
                         @csrf
                         <div class="form-group">
-                            <input name="follower_email" type="email" class="form-control" placeholder="{{trans('dashboard.follower_email')}}">
+                            <input name="follower_email" type="email" class="form-control"
+                                placeholder="{{ trans('dashboard.follower_email') }}">
                             <button type="submit">
                                 <i class="la la-arrow-left"></i>
                             </button>
@@ -435,23 +449,24 @@
                         <h4>اهم الروابط</h4>
                         <ul>
                             <li>
-                                <a href="{{url('/site')}}">{{trans('front.home')}}</a>
+                                <a href="{{ url('/site') }}">{{ trans('front.home') }}</a>
                             </li>
                             <li>
-                                <a href="{{url('/aboutus')}}">{{ trans('front.about_us') }}</a>
+                                <a href="{{ url('/aboutus') }}">{{ trans('front.about_us') }}</a>
                             </li>
                             <li>
-                                <a href="{{route('AllCategories',['category_id' => $category->id])}}">{{ trans('front.store') }}</a>
+                                <a
+                                    href="{{ route('AllCategories', ['category_id' => $category->id]) }}">{{ trans('front.store') }}</a>
                             </li>
-                            
+
                             <li>
-                                <a href="{{url('/blogs')}}">{{ trans('dashboard.blogs') }}</a>
-                            </li>
-                            <li>
-                                <a href="{{url('contactus')}}">{{ trans('front.contact_us') }}</a>
+                                <a href="{{ url('/blogs') }}">{{ trans('dashboard.blogs') }}</a>
                             </li>
                             <li>
-                                <a href="{{url('/privacyPolicy')}}">{{ trans('front.privacy_policy') }}</a>
+                                <a href="{{ url('contactus') }}">{{ trans('front.contact_us') }}</a>
+                            </li>
+                            <li>
+                                <a href="{{ url('/privacyPolicy') }}">{{ trans('front.privacy_policy') }}</a>
                             </li>
                         </ul>
                         <div class="social-s">
@@ -476,14 +491,14 @@
                         <h4>{{ trans('front.contact_us') }}</h4>
                         <ul class="info-s">
                             <li>
-                                 @if( app()->getLocale()=="ar")
-                                    {{$address_ar}}
+                                @if (app()->getLocale() == 'ar')
+                                    {{ $address_ar }}
                                 @else
-                                    {{$address_en}}
+                                    {{ $address_en }}
                                 @endif
                             </li>
-                            <li>{{$phone_one}}</li>
-                            <li>{{$email_one}}</li>
+                            <li>{{ $phone_one }}</li>
+                            <li>{{ $email_one }}</li>
                         </ul>
                     </div>
                 </div>
@@ -491,11 +506,11 @@
             <div class="footer-bottom col-xs-12">
                 <div class="container">
                     <p>جميع الحقوق محفوظة لموقع <span>صوت الطبيعة</span></p>
-                    <img src="{{asset('assets/front/images/payment-method.png')}}" alt="">
-                    
+                    <img src="{{ asset('assets/front/images/payment-method.png') }}" alt="">
+
                     <a href="#">
-                        <img src="{{asset('assets/front/images/dev.svg')}}" alt="">
-                        
+                        <img src="{{ asset('assets/front/images/dev.svg') }}" alt="">
+
                     </a>
                 </div>
             </div>
@@ -511,7 +526,7 @@
                     </button>
                     <div class="modal-body">
 
-                        <form action="{{route('search')}}" method="post">
+                        <form action="{{ route('search') }}" method="post">
                             @csrf
                             <div class="form-group">
                                 <input type="search" class="form-control" placeholder="اكتب بحثك هنا">
@@ -525,7 +540,7 @@
                 </div>
             </div>
         </div><!-- /.modal -->
-        
+
         <div class="modal fade" id="login_pop">
             <div class="modal-dialog">
                 <div class="modal-content col-xs-12">
@@ -537,13 +552,14 @@
                     </div>
                     <div class="modal-body col-xs-12">
                         <div class="form-wrapo col-xs-12">
-                            <form action="{{route('login')}}" method="post">
+                            <form action="{{ route('login') }}" method="post">
                                 <div class="form-group col-xs-12">
                                     <h4>اهلا بعودتك</h4>
                                     <input type="text" name="mobile" class="form-control" placeholder="رقم الهاتف">
                                 </div>
                                 <div class="form-group col-xs-12">
-                                    <input type="password" name="password" class="form-control" placeholder="كلمة المرور">
+                                    <input type="password" name="password" class="form-control"
+                                        placeholder="كلمة المرور">
                                 </div>
                                 <div class="form-group col-xs-12">
                                     <div>
@@ -551,17 +567,19 @@
                                             <input type="checkbox">
                                             <span>تذكرنى</span>
                                         </label>
-                                        <a href="#" data-toggle="modal" data-target="#forget_pop" data-dismiss="modal">هل فقدت كلمة المرور؟</a>
+                                        <a href="#" data-toggle="modal" data-target="#forget_pop"
+                                            data-dismiss="modal">هل فقدت كلمة المرور؟</a>
                                     </div>
                                 </div>
                                 <div class="form-group col-xs-12 has-btns">
                                     <button type="submit" class="btn">دخول</button>
-                                    <button type="reset" class="btn btn-border"  data-dismiss="modal">الغاء</button>
+                                    <button type="reset" class="btn btn-border" data-dismiss="modal">الغاء</button>
                                 </div>
                                 <div class="form-group col-xs-12">
                                     <p>
-                                        ليس لديك حساب ؟ 
-                                        <a href="{{route('register')}}" data-toggle="modal" data-target="#register_pop" data-dismiss="modal">تسجيل جديد</a>
+                                        ليس لديك حساب ؟
+                                        <a href="{{ route('register') }}" data-toggle="modal"
+                                            data-target="#register_pop" data-dismiss="modal">تسجيل جديد</a>
                                     </p>
                                 </div>
                             </form>
@@ -570,7 +588,7 @@
                 </div>
             </div>
         </div><!-- /.modal -->
-        
+
         <div class="modal fade" id="register_pop">
             <div class="modal-dialog">
                 <div class="modal-content col-xs-12">
@@ -582,28 +600,30 @@
                     </div>
                     <div class="modal-body col-xs-12">
                         <div class="form-wrapo col-xs-12">
-                            <form action="{{route('register')}}" method="post">
+                            <form action="{{ route('register') }}" method="post">
 
                                 @csrf
-                             
+
                                 <div class="form-group col-xs-12">
                                     <h4>اهلا بك</h4>
                                     <input type="text" class="form-control" name="mobile" placeholder="رقم الهاتف">
                                     @error('mobile')
-                                        <span> {{$message}} </span>
+                                        <span> {{ $message }} </span>
                                     @enderror
                                 </div>
                                 <div class="form-group col-md-6 col-xs-12">
-                                    <input type="password" class="form-control" name="password" placeholder="كلمة المرور" id="password-field">
+                                    <input type="password" class="form-control" name="password"
+                                        placeholder="كلمة المرور" id="password-field">
                                     <button type="button" class="show-pass" toggle="#password-field">
                                         <i class="la la-eye-slash"></i>
-                                    </button> 
+                                    </button>
                                     @error('password')
-                                        <span> {{$message}} </span>
+                                        <span> {{ $message }} </span>
                                     @enderror
                                 </div>
                                 <div class="form-group col-md-6 col-xs-12">
-                                    <input type="password" class="form-control" name="password_confirmation" placeholder="كلمة المرور مرة اخرى" id="password-field1">
+                                    <input type="password" class="form-control" name="password_confirmation"
+                                        placeholder="كلمة المرور مرة اخرى" id="password-field1">
                                     <button type="button" class="show-pass" toggle="#password-field1">
                                         <i class="la la-eye-slash"></i>
                                     </button>
@@ -614,7 +634,8 @@
                                 <div class="form-group col-xs-12">
                                     <p>
                                         لدى حساب بالفعل ؟
-                                        <a href="#" data-toggle="modal" data-target="#login_pop" data-dismiss="modal">تسجيل دخول</a>
+                                        <a href="#" data-toggle="modal" data-target="#login_pop"
+                                            data-dismiss="modal">تسجيل دخول</a>
                                     </p>
                                 </div>
                             </form>
@@ -623,8 +644,8 @@
                 </div>
             </div>
         </div><!-- /.modal -->
-        
-        
+
+
         <div class="modal fade" id="forget_pop">
             <div class="modal-dialog">
                 <div class="modal-content col-xs-12">
@@ -651,7 +672,7 @@
                 </div>
             </div>
         </div><!-- /.modal -->
-        
+
         <div class="modal fade" id="verify_pop">
             <div class="modal-dialog">
                 <div class="modal-content col-xs-12">
@@ -678,7 +699,7 @@
                 </div>
             </div>
         </div><!-- /.modal -->
-        
+
         <div class="modal fade" id="editPass_pop">
             <div class="modal-dialog">
                 <div class="modal-content col-xs-12">
@@ -695,7 +716,8 @@
                                     <input type="password" class="form-control" placeholder="تعديل كلمة السر">
                                 </div>
                                 <div class="form-group col-xs-12">
-                                    <input type="password" class="form-control" placeholder="الرقم السرى الجديد مرة اخرى">
+                                    <input type="password" class="form-control"
+                                        placeholder="الرقم السرى الجديد مرة اخرى">
                                 </div>
                                 <div class="form-group col-xs-12 has-btns">
                                     <button type="submit" class="btn btn-reg">حفظ</button>
@@ -709,20 +731,20 @@
     </div>
 
     <!-- Javascript Files -->
-    <script src="{{asset('assets/front/js/jquery-2.2.2.min.js')}}"></script>
-    
-    <script src="{{asset('assets/front/js/jquery-ui.js')}}"></script>
-    
-    <script src="{{asset('assets/front/js/bootstrap.min.js')}}"></script>
-    
-    <script src="{{asset('assets/front/js/jquery.fancybox.min.js')}}"></script>
-    
-    <script src="{{asset('assets/front/js/owl.carousel.min.js')}}"></script>
-    
-    <script src="{{asset('assets/front/js/aos.js')}}"></script>
+    <script src="{{ asset('assets/front/js/jquery-2.2.2.min.js') }}"></script>
 
-    <script src="{{asset('assets/front/js/script.js')}}"></script>
-    
+    <script src="{{ asset('assets/front/js/jquery-ui.js') }}"></script>
+
+    <script src="{{ asset('assets/front/js/bootstrap.min.js') }}"></script>
+
+    <script src="{{ asset('assets/front/js/jquery.fancybox.min.js') }}"></script>
+
+    <script src="{{ asset('assets/front/js/owl.carousel.min.js') }}"></script>
+
+    <script src="{{ asset('assets/front/js/aos.js') }}"></script>
+
+    <script src="{{ asset('assets/front/js/script.js') }}"></script>
+
 
 </body>
 

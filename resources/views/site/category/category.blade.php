@@ -5,7 +5,7 @@
     <main class="main-content col-xs-12">
         <div class="bread-crumb col-xs-12" style="background-image: url({{ asset('uploads/about_us/hero.png') }})">
             <div class="container">
-                <h3>نتائج البحث</h3>
+                <h3>{{ trans('dashboard.categories') }}</h3>
                 <ul>
                     <li>
                         <a href="{{ url('/site') }}">{{ trans('front.home') }}</a>
@@ -150,18 +150,7 @@
                                 </div>
                             </div>
 
-                            {{-- <div class="c-widget">
-                                <div class="c-adds">
-                                    <img src="images/ads-banner.png" alt="">
-                                    <div class="ads-cap">
-                                        <h5>
-                                            توفير اكثر من <b>25%</b>
-                                        </h5>
-                                        <p>طعام واكسسورات الحيوانات</p>
-                                        <a href="#" class="btn">تسوق الان</a>
-                                    </div>
-                                </div>
-                            </div> --}}
+
 
                             <div class="c-widget">
                                 <h4>{{ trans('front.featured_products') }}</h4>
@@ -224,7 +213,6 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script>
-
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

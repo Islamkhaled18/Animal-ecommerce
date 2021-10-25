@@ -130,6 +130,8 @@ return [
     'go_to_our_store'=>'Go to our store',
     'search_result'=>'Search result',
     'you_search_about'=>'You search about',
+    'add_to_cart'=>'Add to cart',
+    'related_products'=>'Related products',
 
 
 

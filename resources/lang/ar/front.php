@@ -136,6 +136,10 @@ return [
     'go_to_our_store'=>'اذهب الى متجرنا',
     'search_result'=>'نتيجة البحث',
     'you_search_about'=>'انت تبحث عن',
+    'add_to_cart'=>'اضف الى السله',
+    'related_products'=>'منتجات ذات صله',
+
+
 
 
 
